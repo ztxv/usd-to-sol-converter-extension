@@ -75,6 +75,11 @@
       } catch { notice('status', 'Reload this page to activate SOLify. Some browser pages cannot be changed.'); }
     } else notice('status', 'Open a normal website to use page controls.');
     paintSettings();
+    $('github-link')?.addEventListener('click', e => {
+      e.preventDefault();
+      if (chrome?.tabs?.create) chrome.tabs.create({url: e.currentTarget.href});
+      else window.open(e.currentTarget.href, '_blank', 'noopener,noreferrer');
+    });
     $('enabled').addEventListener('change', () => save({enabled: $('enabled').checked}));
     $('display').addEventListener('change', () => save({displayStyle: $('display').value}));
     $('precision').addEventListener('change', () => save({precisionMode: $('precision').value}));

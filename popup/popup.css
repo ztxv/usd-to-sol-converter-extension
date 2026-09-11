@@ -22,7 +22,7 @@ main {
   padding:18px 22px;
 }
 
-header,.brand,.market-top,.market-bottom,.coin,.toggle-row,.select-row,.preview,footer {
+header,.brand,.header-right,.market-top,.market-bottom,.coin,.toggle-row,.select-row,.preview,footer {
   display:flex;
   align-items:center;
 }
@@ -33,6 +33,35 @@ header {
 
 .brand {
   gap:10px;
+}
+
+.header-right {
+  gap:8px;
+}
+
+.github-link {
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border-radius:9px;
+  color:#9c96a9;
+  text-decoration:none;
+  background:transparent;
+  transition:color .16s ease,background-color .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+
+.github-link:hover,
+.github-link:focus-visible {
+  color:#cca5ed;
+  background:#281d38;
+  box-shadow:0 0 0 1px #4e355c, 0 0 18px rgba(204,165,237,.28);
+  transform:translateY(-1px);
+  outline:none;
+}
+
+.github-link:active {
+  transform:translateY(0);
 }
 
 h1 {
