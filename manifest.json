@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "SOLify",
+  "version": "1.0.0",
+  "description": "SOLify the web. View dollar prices across the web in SOL.",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["https://api.coinbase.com/*", "https://api.kraken.com/*"],
+  "background": {"service_worker": "background/service-worker.js"},
+  "action": {"default_popup": "popup/popup.html", "default_title": "SOLify the web"},
+  "icons": {"16": "assets/icons/16.png", "32": "assets/icons/32.png", "48": "assets/icons/48.png", "128": "assets/icons/128.png"},
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["utils/settings.js", "content/detector.js", "utils/formatting.js", "content/converter.js", "content/content.js"],
+    "run_at": "document_idle"
+  }],
+  "web_accessible_resources": [{"resources": ["assets/solana.svg"], "matches": ["http://*/*", "https://*/*"]}]
+}

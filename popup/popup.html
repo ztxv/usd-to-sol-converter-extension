@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SOLify</title><link rel="stylesheet" href="popup.css"></head>
+<body>
+  <main>
+    <header><div class="brand"><img src="../assets/solana.svg" alt="" width="25" height="20"><h1>SOLify<span class="dot">.</span></h1></div><span class="badge">THE SOL LENS</span></header>
+    <p class="tagline">Same internet. Different denomination.</p>
+    <section class="market" aria-label="SOL market price">
+      <div class="market-top"><span class="coin"><span class="coin-icon"><img src="../assets/solana.svg" width="19" height="15" alt=""></span><span>SOL <small>/ USD</small></span></span><span class="live">● MARKET PRICE</span></div>
+      <div id="price" class="price">—</div>
+      <div class="market-bottom"><span id="updated">Fetching market price…</span><button id="refresh" class="refresh" aria-label="Refresh SOL price" title="Refresh SOL price">↻ <span>Refresh</span></button></div>
+    </section>
+    <p id="rate-error" class="notice" role="status" hidden></p>
+    <section class="controls" aria-label="Preferences">
+      <label class="toggle-row"><span><strong>Conversion</strong><small id="conversion-note">SOLify the web.</small></span><input id="enabled" type="checkbox" role="switch"><span class="switch" aria-hidden="true"></span></label>
+      <div class="divider"></div>
+      <div class="select-row"><label for="display">Display</label><select id="display"><option value="logo">Logo</option><option value="clean">Clean</option><option value="ticker">Ticker</option></select></div>
+      <div class="select-row"><label for="precision">Precision</label><select id="precision"><option value="meme">Meme</option><option value="normal">Normal</option><option value="autistic">Autistic</option></select></div>
+      <div class="preview"><span>PREVIEW</span><output id="preview"><img src="../assets/solana.svg" alt="" width="14" height="11"> 1.002 SOL</output></div>
+      <label class="toggle-row hover-row"><span>Original on hover</span><input id="hover" type="checkbox" role="switch"><span class="switch" aria-hidden="true"></span></label>
+    </section>
+    <section class="site-section" aria-label="Current site"><label class="toggle-row"><span class="site-copy"><strong id="site">Current site</strong><small id="site-note">Allow conversion on this site</small></span><input id="site-enabled" type="checkbox" role="switch"><span class="switch" aria-hidden="true"></span></label></section>
+    <button id="restore" class="restore">↶ <span>Restore USD on this page</span></button>
+    <p id="status" class="notice" role="status" hidden></p>
+    <footer><span class="privacy-dot"></span> No wallets. No tracking. Just SOL.</footer>
+  </main>
+  <script src="../utils/settings.js"></script><script src="../utils/formatting.js"></script><script src="popup.js"></script>
+</body>
+</html>
