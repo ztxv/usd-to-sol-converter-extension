@@ -1,0 +1,21 @@
+<!-- Representative Amazon price markup; no live page capture is implied. -->
+<style>
+#amazon .a-offscreen { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(1px,1px,1px,1px) }
+#amazon .a-price { position:relative; font-size:24px }
+#amazon .a-price-decimal { visibility:hidden; position:absolute }
+#amazon .a-price-fraction, #amazon .a-price-symbol { font-size:12px; vertical-align:super }
+#amazon .a-text-price > [aria-hidden=true] { text-decoration:line-through }
+</style>
+<div id="amazon">
+<a href="#amazon-click" id="amazon-link"><span id="amazon-normal" class="a-price"><span class="a-offscreen">$129.99</span><span aria-hidden="true"><span class="a-price-symbol">$</span><span class="a-price-whole">129<span class="a-price-decimal">.</span></span><span class="a-price-fraction">99</span></span></span></a>
+<span id="amazon-sale" class="a-price"><span class="a-offscreen">$99.99</span><span aria-hidden="true"><span class="a-price-symbol">$</span><span class="a-price-whole">99<span class="a-price-decimal">.</span></span><span class="a-price-fraction">99</span></span></span>
+<span id="amazon-original" class="a-price a-text-price" data-a-strike="true"><span class="a-offscreen">$149.99</span><span aria-hidden="true">$149.99</span></span>
+<span id="amazon-late" class="a-price"><span class="a-offscreen">$25.50</span><span aria-hidden="true"><span class="a-price-symbol">$</span></span></span>
+<span id="amazon-foreign" class="a-price"><span class="a-offscreen">€99.99</span><span aria-hidden="true"><span>€</span><span>99.99</span></span></span>
+<div hidden><span class="a-price"><span aria-hidden="true">$99</span></span></div>
+<div aria-hidden="true"><span class="a-price"><span aria-hidden="true">$99</span></span></div>
+<div style="display:none"><span class="a-price"><span aria-hidden="true">$99</span></span></div>
+<div contenteditable="true"><span class="a-price"><span aria-hidden="true">$99</span></span></div>
+<span aria-hidden="true" id="unrelated-hidden">$99</span>
+<span class="a-price" id="amazon-unsafe"><span aria-hidden="true"><input value="$99"><span>$99</span></span></span>
+</div>

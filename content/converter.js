@@ -1,8 +1,11 @@
 (() => {
+  // Amazon's visible price is aria-hidden because a sibling supplies the accessible USD label.
+  const priceVisual = '.a-price > [aria-hidden="true"]';
   const marker = '[data-solified="true"]';
   const unsafe = 'script,style,noscript,template,textarea,input,select,option,code,pre,kbd,samp,' +
     'svg,math,canvas,iframe,object,embed,title,head,button,[role="textbox"],[role="spinbutton"],' +
-    '[contenteditable]:not([contenteditable="false"]),[hidden],[inert],[aria-hidden="true"]';
+    '[contenteditable]:not([contenteditable="false"]),[hidden],[inert],' +
+    '[aria-hidden="true"]:not(.a-price > [aria-hidden="true"]),.a-price > .a-offscreen';
   const records = new Map();
   const own = node => (node.nodeType === 1 ? node : node.parentElement)?.closest(marker);
   // One delegated handler keeps blocked images from leaving broken icons on the page.
@@ -11,7 +14,7 @@
     if (img instanceof HTMLImageElement && records.has(img.parentElement)) img.remove();
   }, true);
   function safe(node) {
-    const parent = node.parentElement;
+    const parent = node.nodeType === 1 ? node : node.parentElement;
     if (!parent || parent.namespaceURI !== 'http://www.w3.org/1999/xhtml' || parent.closest(unsafe) || own(node)) return false;
     if (parent.isContentEditable) return false;
     // Only measure text that actually contains a recognizable amount.
@@ -42,7 +45,24 @@
     return true;
   }
   function process(node, rate, settings) {
-    if (!node.isConnected || node.nodeType !== 3) return;
+    if (!node.isConnected) return;
+    if (node.nodeType === 1) {
+      if (!node.matches(priceVisual) || node.querySelector(marker) || !safe(node)) return;
+      // Only combine a complete price made of passive spans, never a product/card subtree.
+      if ([...node.querySelectorAll('*')].some(el => el.localName !== 'span' || el.matches(unsafe))) return;
+      const text = node.textContent.trim();
+      const matches = SolifyDetector.detect(text);
+      if (matches.length !== 1 || matches[0].original !== text) return;
+      const span = document.createElement('span');
+      span.dataset.solified = 'true';
+      span.dataset.originalUsd = text;
+      const record = {...matches[0], nodes: [...node.childNodes]};
+      if (!render(span, record, rate, settings)) return;
+      records.set(span, record);
+      node.replaceChildren(span);
+      return;
+    }
+    if (node.nodeType !== 3) return;
     const matches = SolifyDetector.detect(node.data);
     if (!matches.length || !safe(node)) return;
     const fragment = document.createDocumentFragment();
@@ -63,11 +83,18 @@
   }
   function collect(root) {
     if (!root.isConnected || own(root)) return [];
+    // A late insertion or text update may start inside a split price.
+    const visual = (root.nodeType === 1 ? root : root.parentElement)?.closest(priceVisual);
+    if (visual) return [visual];
     if (root.nodeType === 3) return [root];
     if (![1, 9, 11].includes(root.nodeType)) return [];
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
-        if (node.nodeType === 1) return node.matches(unsafe + ',' + marker) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP;
+        if (node.parentElement?.closest(priceVisual)) return NodeFilter.FILTER_REJECT;
+        if (node.nodeType === 1) {
+          if (node.matches(unsafe + ',' + marker)) return NodeFilter.FILTER_REJECT;
+          return node.matches(priceVisual) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        }
         return NodeFilter.FILTER_ACCEPT;
       }
     });
@@ -80,7 +107,7 @@
     for (const [span, record] of records) {
       if (span.isConnected) {
         // Do not overwrite a site's newer update with our older USD snapshot.
-        if (span.textContent === record.rendered) span.replaceWith(document.createTextNode(record.original));
+        if (span.textContent === record.rendered) span.replaceWith(...(record.nodes || [document.createTextNode(record.original)]));
         else span.replaceWith(...span.childNodes);
       }
     }
@@ -108,7 +135,7 @@
       const record = records.get(span);
       if (record && (span.closest(unsafe) || span.isContentEditable)) {
         records.delete(span);
-        if (span.textContent === record.rendered) span.replaceWith(document.createTextNode(record.original));
+        if (span.textContent === record.rendered) span.replaceWith(...(record.nodes || [document.createTextNode(record.original)]));
         else span.replaceWith(...span.childNodes);
       }
     }

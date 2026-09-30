@@ -29,6 +29,42 @@ const extension = path.resolve(__dirname, '..');
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     const wait = fn => page.waitForFunction(fn);
     await wait(() => document.querySelector('#basic [data-solified]'));
+    // Amazon uses separate accessible and visual copies, including split cents.
+    await page.evaluate(html => {
+      document.body.insertAdjacentHTML('beforeend', html);
+      const normal = document.getElementById('amazon-normal');
+      window.amazonOriginal = normal.innerHTML;
+      window.amazonSymbol = normal.querySelector('.a-price-symbol');
+      window.amazonClicks = 0;
+      document.getElementById('amazon-link').addEventListener('click', e => {
+        e.preventDefault(); window.amazonClicks++;
+      });
+    }, fs.readFileSync(path.join(__dirname, 'amazon.html'), 'utf8'));
+    await wait(() => document.querySelector('#amazon-normal [aria-hidden="true"] [data-solified]'));
+    assert.equal(await page.locator('#amazon [data-solified]').count(), 3);
+    for (const [id, usd] of [['normal',129.99], ['sale',99.99], ['original',149.99]]) {
+      assert.equal(await page.locator(`#amazon-${id} [data-solified]`).getAttribute('data-original-usd'), `$${usd}`);
+      assert.equal(await page.locator(`#amazon-${id} .a-offscreen`).textContent(), `$${usd}`);
+    }
+    assert.equal(await page.locator('#amazon-normal [data-solified]').textContent(), '1.302 SOL');
+    assert.ok(await page.locator('#amazon-normal [data-solified]').isVisible());
+    assert.equal(await page.locator('#amazon-original > [aria-hidden]').evaluate(el => getComputedStyle(el).textDecorationLine), 'line-through');
+    await page.locator('#amazon-link').click();
+    assert.equal(await page.evaluate(() => window.amazonClicks), 1);
+    // A price assembled over multiple DOM mutations must be reconsidered as a group.
+    await page.evaluate(() => document.querySelector('#amazon-late > [aria-hidden]').insertAdjacentHTML('beforeend', '<span class="a-price-whole">25<span class="a-price-decimal">.</span></span><span class="a-price-fraction">50</span>'));
+    await wait(() => document.querySelector('#amazon-late [data-solified]')?.dataset.originalUsd === '$25.50');
+    // Replace the rendered subtree, then update its rendered text, as site scripts can do.
+    await page.evaluate(() => { document.querySelector('#amazon-sale > [aria-hidden]').innerHTML = '<span>$</span><span>79.</span><span>95</span>'; });
+    await wait(() => document.querySelector('#amazon-sale [data-solified]')?.dataset.originalUsd === '$79.95');
+    await page.evaluate(() => { document.querySelector('#amazon-sale [data-solified]').lastChild.data = '$69.95'; });
+    await wait(() => document.querySelector('#amazon-sale [data-solified]')?.dataset.originalUsd === '$69.95');
+    // Becoming editable restores the exact split markup, including the original nodes.
+    await page.evaluate(() => document.getElementById('amazon-normal').setAttribute('contenteditable', 'true'));
+    await wait(() => !document.querySelector('#amazon-normal [data-solified]'));
+    assert.ok(await page.evaluate(() => document.getElementById('amazon-normal').innerHTML === window.amazonOriginal && document.querySelector('#amazon-normal .a-price-symbol') === window.amazonSymbol));
+    await page.evaluate(() => document.getElementById('amazon-normal').removeAttribute('contenteditable'));
+    await wait(() => document.querySelector('#amazon-normal [data-solified]'));
     assert.equal(await page.locator('#basic [data-solified]').count(), 6);
     assert.equal(await page.locator('#notations [data-solified]').count(), 7);
     assert.equal(await page.locator('#multiple [data-solified]').count(), 2);
@@ -76,11 +112,15 @@ const extension = path.resolve(__dirname, '..');
     await wait(() => !document.querySelector('[data-solified]'));
     assert.equal(await page.locator('#basic').textContent(), '$5 · $5.00 · $9.99 · $100 · $1,000 · $1,299.99');
     assert.equal(await page.locator('#changing').textContent(), 'Current price: $200.');
+    assert.ok(await page.evaluate(() => document.getElementById('amazon-normal').innerHTML === window.amazonOriginal && document.querySelector('#amazon-normal .a-price-symbol') === window.amazonSymbol));
+    assert.equal(await page.locator('#amazon-sale > [aria-hidden]').textContent(), '$69.95');
     await page.getByRole('button', {name:'Add a price', exact:true}).click();
     await page.waitForTimeout(100);
     assert.equal(await page.locator('[data-solified]').count(), 0, 'restore stays paused');
     await command('RESUME_PAGE');
     await wait(() => document.querySelector('#basic [data-solified]'));
+    await wait(() => document.querySelector('#amazon-normal [data-solified]'));
+    await page.evaluate(() => document.getElementById('amazon').remove());
     await worker.evaluate(async () => chrome.storage.local.set({settings:{disabledDomains:['127.0.0.1']}}));
     await wait(() => !document.querySelector('[data-solified]'));
     await worker.evaluate(async () => chrome.storage.local.set({settings:{enabled:false}}));
@@ -144,7 +184,7 @@ const extension = path.resolve(__dirname, '..');
     await protectedPage.waitForTimeout(100);
     assert.equal(await protectedPage.locator('p').textContent(), '$100');
     assert.deepEqual(errors, []);
-    console.log('PASS: real MV3 loading, parsing, dynamic DOM, idempotence, site updates, restoration, settings, popup controls, manual rate propagation, 2,000-node batch, offline behavior, financial protection.');
+    console.log('PASS: real MV3 loading, Amazon split/sale/original prices, delayed rendering and exact DOM restoration, parsing, dynamic DOM, idempotence, site updates, restoration, settings, popup controls, manual rate propagation, 2,000-node batch, offline behavior, financial protection.');
   } finally {
     await context?.close();
     await new Promise(r => server.close(r));
