@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SOLify · Same internet. Different denomination.</title>
+  <meta name="description" content="SOLify is a Chrome extension that turns dollar prices on any website into SOL. Try the live demo, which runs the extension's real conversion engine.">
+  <meta property="og:title" content="SOLify: same internet, different denomination">
+  <meta property="og:description" content="A Chrome extension that shows every dollar price on the web in SOL. Try it in your browser.">
+  <meta name="theme-color" content="#101115">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#demo">Skip to the demo</a>
+
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <a class="logo" href="#top" aria-label="SOLify home"><img src="assets/solana.svg" alt="" width="25" height="20"><span>SOLify<span class="dot">.</span></span></a>
+      <div class="nav-links">
+        <a href="#demo">Demo</a>
+        <a href="#how">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a class="gh" href="https://github.com/ztxv/usd-to-sol-converter-extension" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero wrap" id="top">
+    <p class="eyebrow">Chrome extension · Manifest V3 · No account</p>
+    <h1>Same internet.<br><span class="grad">Different denomination.</span></h1>
+    <p class="lede">SOLify finds the dollar amounts on whatever site you're reading and shows them in SOL at the current market price. It changes only the numbers, so <em>$100 million</em> turns into <em>1.002 SOL million</em> and the rest of the sentence stays put.</p>
+
+    <div class="ticker-card" aria-live="polite">
+      <div class="ticker-line" id="hero-line"></div>
+      <div class="ticker-meta"><span class="ticker-state" id="hero-state">USD</span><span class="rate-chip" id="rate-chip"><span class="pulse" aria-hidden="true"></span><span id="rate-chip-text">Fetching SOL price…</span></span></div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn primary" href="#demo">Try the live demo</a>
+      <a class="btn ghost" href="#install">Install it</a>
+    </div>
+  </header>
+
+  <!-- ============================ DEMO ============================ -->
+  <section class="section wrap" id="demo">
+    <div class="section-head">
+      <p class="kicker">01 · The demo</p>
+      <h2>A browser, a popup, and the extension's real engine.</h2>
+      <p>The window on the left is a fake browser. The popup next to it works like the real one, and its settings feed into the same detector, formatter and converter code the extension runs. Hover a SOL amount to see the original USD.</p>
+    </div>
+
+    <div class="demo-grid">
+      <div class="browser" aria-label="Simulated browser window">
+        <div class="browser-top">
+          <div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="tabs" role="tablist" aria-label="Demo websites">
+            <button role="tab" class="tab" data-site="shop" aria-selected="true">Nimbus Supply</button>
+            <button role="tab" class="tab" data-site="news" aria-selected="false">The Ledger</button>
+            <button role="tab" class="tab" data-site="bank" aria-selected="false">Bank</button>
+          </div>
+        </div>
+        <div class="address">
+          <span class="lock" aria-hidden="true">🔒</span><span id="address-host">shop.example</span><span class="address-path" id="address-path">/deals</span>
+          <span class="ext-pin" id="ext-pin" title="SOLify is active on this page"><img src="assets/solana.svg" alt="" width="15" height="12"></span>
+        </div>
+        <div class="viewport" id="viewport" role="tabpanel"></div>
+        <div class="site-js">
+          <span class="site-js-label">Site JavaScript</span>
+          <button class="mini" id="add-price">Add a price</button>
+          <button class="mini" id="change-price">Change a price</button>
+          <span class="site-js-note" id="site-js-note">The page adds or edits prices. SOLify notices the change and converts the new amount.</span>
+        </div>
+      </div>
+
+      <aside class="popup" aria-label="SOLify popup (simulated)">
+        <div class="popup-head">
+          <div class="brand"><img src="assets/solana.svg" alt="" width="25" height="20"><strong>SOLify<span class="dot">.</span></strong></div>
+          <span class="badge">THE SOL LENS</span>
+        </div>
+        <p class="tagline">Same internet. Different denomination.</p>
+        <section class="market" aria-label="SOL market price">
+          <div class="market-top"><span class="coin"><span class="coin-icon"><img src="assets/solana.svg" width="19" height="15" alt=""></span><span>SOL <small>/ USD</small></span></span><span class="live" id="live-label">● MARKET PRICE</span></div>
+          <div class="price" id="price">—</div>
+          <div class="market-bottom"><span id="updated">Fetching market price…</span><button id="refresh" class="refresh" aria-label="Refresh SOL price">↻ <span>Refresh</span></button></div>
+        </section>
+        <p class="notice" id="rate-error" role="status" hidden></p>
+        <div class="controls">
+          <label class="toggle-row"><span><strong>Conversion</strong><small id="conversion-note">SOLify the web.</small></span><input id="enabled" type="checkbox" role="switch" checked><span class="switch" aria-hidden="true"></span></label>
+          <div class="divider"></div>
+          <div class="select-row"><label for="display">Display</label><select id="display"><option value="logo">Logo</option><option value="clean">Clean</option><option value="ticker">Ticker</option></select></div>
+          <div class="select-row"><label for="precision">Precision</label><select id="precision"><option value="meme">Meme</option><option value="normal" selected>Normal</option><option value="autistic">Autistic</option></select></div>
+          <div class="preview"><span>PREVIEW</span><output id="preview"></output></div>
+          <label class="toggle-row hover-row"><span>Original on hover</span><input id="hover" type="checkbox" role="switch" checked><span class="switch" aria-hidden="true"></span></label>
+        </div>
+        <div class="site-section">
+          <label class="toggle-row"><span class="site-copy"><strong id="site">shop.example</strong><small id="site-note">Allow conversion on this site</small></span><input id="site-enabled" type="checkbox" role="switch" checked><span class="switch" aria-hidden="true"></span></label>
+        </div>
+        <button id="restore" class="restore">↶ <span>Restore USD on this page</span></button>
+        <p class="notice" id="status" role="status" hidden></p>
+        <footer class="popup-foot"><span class="privacy-dot"></span> No wallets. No tracking. Just SOL.</footer>
+      </aside>
+    </div>
+
+    <ul class="try-list" aria-label="Things to try">
+      <li><b>Switch Display</b> between Logo, Clean and Ticker ($SOL).</li>
+      <li><b>Switch Precision.</b> Meme rounds to 2 decimals. Autistic prints every digit JavaScript gives it.</li>
+      <li><b>Open the Bank tab.</b> Financial sites are blocked, so their dollars stay dollars.</li>
+      <li><b>Restore USD</b> to put back the page's original text, character for character.</li>
+    </ul>
+  </section>
+
+  <!-- ============================ PLAYGROUND ============================ -->
+  <section class="section wrap" id="playground">
+    <div class="section-head">
+      <p class="kicker">02 · Paste anything</p>
+      <h2>See what the detector picks up.</h2>
+      <p>Type or paste any text. Each USD amount the extension would convert is highlighted, and the rest are left alone. It uses the Display and Precision settings from the popup above.</p>
+    </div>
+    <div class="play">
+      <div class="play-col">
+        <label class="play-label" for="play-input">Input</label>
+        <textarea id="play-input" spellcheck="false" rows="7">Was $199.99, now $149.99. Shipping is 4.99 USD, or free over US$35.
+The company raised $100 million at a USD 1,200,000,000 valuation.
+Not touched: CA$100, €100, -$100, $1,23 and the ticker 1.002 $SOL.</textarea>
+        <div class="chips" id="play-samples">
+          <button class="chip" data-sample="Rent is $2,450/mo. Coffee is $5.75. My crypto bag is down $0.000001 today.">Daily life</button>
+          <button class="chip" data-sample="Series B: $40 million led by a16z, bringing total funding to USD $62.5 million. Burn: $1.2 million per month.">Startup news</button>
+          <button class="chip" data-sample="Prices: $5 · $5.00 · $9.99 · $1,000 · US $49 · USD 49 · 49 USD · CAD $100 · AU$49 · $10abc">Edge cases</button>
+        </div>
+      </div>
+      <div class="play-col">
+        <span class="play-label">Output</span>
+        <div class="play-output" id="play-output" aria-live="polite"></div>
+        <table class="matches" aria-label="Detected amounts">
+          <thead><tr><th scope="col">Matched</th><th scope="col">USD</th><th scope="col">SOL</th></tr></thead>
+          <tbody id="play-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ HOW ============================ -->
+  <section class="section wrap" id="how">
+    <div class="section-head">
+      <p class="kicker">03 · How it works</p>
+      <h2>Four small steps, and none of them touch your data.</h2>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <span class="step-n">1</span>
+        <h3>Detect</h3>
+        <p>A strict pattern finds <code>$5</code>, <code>$1,299.99</code>, <code>US$49</code>, <code>USD 49</code> and <code>49 USD</code>. It skips anything it can't be sure about, like <code>CA$</code>, negatives, broken grouping and <code>$10abc</code>.</p>
+        <span class="file">content/detector.js</span>
+      </li>
+      <li class="step">
+        <span class="step-n">2</span>
+        <h3>Price</h3>
+        <p>The background worker gets SOL/USD from Coinbase, with Kraken as a fallback. Quotes are cached for five minutes and refreshes are limited to one a minute. If no real quote is available, nothing gets converted.</p>
+        <span class="file">background/service-worker.js</span>
+      </li>
+      <li class="step">
+        <span class="step-n">3</span>
+        <h3>Replace</h3>
+        <p>Each amount gets wrapped in its own small inline span. Parent <code>innerHTML</code>, form values and the page's own JavaScript are never changed, so links and listeners keep working.</p>
+        <span class="file">content/converter.js</span>
+      </li>
+      <li class="step">
+        <span class="step-n">4</span>
+        <h3>Watch &amp; restore</h3>
+        <p>A batched MutationObserver catches prices the site adds later, without polling. The exact original text is saved, so Restore puts it back character for character.</p>
+        <span class="file">content/content.js</span>
+      </li>
+    </ol>
+
+    <div class="hands-off">
+      <div>
+        <h3>What it never touches</h3>
+        <p>Text you type, code and data in the page are all skipped, so nothing breaks.</p>
+      </div>
+      <ul class="pill-list">
+        <li>Inputs &amp; textareas</li><li>Selects</li><li>Editable text</li><li>Code &amp; pre blocks</li><li>Hidden text</li><li>SVG &amp; canvas</li><li>Other currencies</li><li>Banks, brokers &amp; exchanges</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================ PRIVACY ============================ -->
+  <section class="section wrap" id="privacy">
+    <div class="privacy">
+      <div>
+        <p class="kicker">04 · Privacy</p>
+        <h2>No wallets. No tracking. Just SOL.</h2>
+        <p>The only network calls the extension makes are for the SOL price. It doesn't send page content, URLs or browsing history anywhere. It has no analytics, accounts or remote code, and the extension makes no claims about trading.</p>
+      </div>
+      <dl class="perm">
+        <div><dt><code>storage</code></dt><dd>Your settings and the price cache. Local only, nothing synced.</dd></div>
+        <div><dt><code>activeTab</code></dt><dd>Reads the current hostname only while the popup is open.</dd></div>
+        <div><dt>Site access</dt><dd>Needed to change price text on normal websites.</dd></div>
+        <div><dt>2 price APIs</dt><dd>Coinbase spot price, with the Kraken ticker as a fallback.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============================ INSTALL ============================ -->
+  <section class="section wrap" id="install">
+    <div class="install">
+      <div>
+        <p class="kicker">05 · Install</p>
+        <h2>Running in under a minute.</h2>
+        <p>There's no build step, no API key and no account.</p>
+        <a class="btn primary" href="https://github.com/ztxv/usd-to-sol-converter-extension" target="_blank" rel="noopener noreferrer">Get the code on GitHub</a>
+      </div>
+      <ol class="install-steps">
+        <li>Download or clone the repository.</li>
+        <li>Open <code>chrome://extensions</code> and turn on <b>Developer mode</b>.</li>
+        <li>Click <b>Load unpacked</b> and pick the folder with <code>manifest.json</code>.</li>
+        <li>Pin SOLify and reload any tabs that were already open.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer class="site-foot wrap">
+    <span><img src="assets/solana.svg" alt="" width="18" height="14"> SOLify</span>
+    <span>Just for fun and display only. Converted amounts aren't a trade quote.</span>
+  </footer>
+
+  <!-- The extension's engine expects chrome.runtime.getURL. Point it at this site's copy of the logo. -->
+  <script>globalThis.chrome = {runtime: {getURL: path => path}};</script>
+  <script src="engine/detector.js"></script>
+  <script src="engine/formatting.js"></script>
+  <script src="engine/converter.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

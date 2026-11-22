@@ -27,6 +27,10 @@ No build step, API key, wallet, or account is required. The folder must stay on 
 - Initial scanning and batched dynamic updates, with no polling of the page.
 - Five-minute price cache, manual refresh, one fallback, and graceful failure.
 
+## Demo website
+
+`demo-site/` is a static page that runs SOLify's real conversion engine on a simulated browser with a working popup. You don't need to install anything to try it. To deploy it, drop the folder on [vercel.com/drop](https://vercel.com/drop), or import this repository in Vercel with Root Directory set to `demo-site`. See [`demo-site/README.md`](demo-site/README.md).
+
 ## Try the demo
 
 From this folder, run:
