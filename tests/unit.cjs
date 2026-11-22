@@ -39,3 +39,13 @@ test('protected subdomains and validated preferences', () => {
   assert.equal(SolifySettings.isProtected('chase.com.evil.test'), false);
   assert.equal(SolifySettings.normalize({precisionMode:'wrong'}).precisionMode, 'normal');
 });
+test('demo site engine copies match the extension source', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const root = path.resolve(__dirname, '..');
+  for (const [copy, source] of [['detector.js', 'content/detector.js'], ['formatting.js', 'utils/formatting.js'], ['converter.js', 'content/converter.js']]) {
+    assert.equal(fs.readFileSync(path.join(root, 'demo-site/engine', copy), 'utf8'), fs.readFileSync(path.join(root, source), 'utf8'),
+      `demo-site/engine/${copy} is stale. Copy ${source} over it.`);
+  }
+  assert.equal(fs.readFileSync(path.join(root, 'demo-site/assets/solana.svg'), 'utf8'), fs.readFileSync(path.join(root, 'assets/solana.svg'), 'utf8'));
+});
