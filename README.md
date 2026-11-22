@@ -173,6 +173,10 @@ python3 -m http.server 8080 --bind 127.0.0.1
 
 The extension's permissions don't include `file://` URLs, so the playground has to be served over HTTP.
 
+<p align="center">
+  <img src="docs/screenshots/extension-playground.png" width="620" alt="The local test playground with the real extension converting it">
+</p>
+
 <details>
 <summary><b>Known limits</b></summary>
 
