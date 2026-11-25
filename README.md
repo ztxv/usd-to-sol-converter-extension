@@ -14,7 +14,7 @@ A Chrome extension that shows every dollar price on the web in SOL. `$100 millio
 ![Vanilla JS](https://img.shields.io/badge/vanilla-JS-F7DF1E?logo=javascript&logoColor=black)
 ![No tracking](https://img.shields.io/badge/tracking-none-8A63D2)
 
-### [**▶ Try the live demo at solify-two.vercel.app**](https://solify-two.vercel.app/)
+### [**▶ Try the live demo at solify-extension.vercel.app**](https://solify-extension.vercel.app/)
 
 [Install](#install) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Privacy](#privacy-and-permissions) &nbsp;·&nbsp; [Demo site](#demo-site)
 
@@ -126,7 +126,7 @@ The protected list covers a set of major banks, brokers, crypto exchanges, payme
 
 ## Demo site
 
-[`demo-site/`](demo-site) is a static page that runs SOLify's real detector, formatter and converter against a simulated browser with three sites, next to a working copy of the popup. It also has a "paste anything" playground. Nothing to install. **[Open the live demo →](https://solify-two.vercel.app/)**
+[`demo-site/`](demo-site) is a static page that runs SOLify's real detector, formatter and converter against a simulated browser with three sites, next to a working copy of the popup. It also has a "paste anything" playground. Nothing to install. **[Open the live demo →](https://solify-extension.vercel.app/)**
 
 <p align="center">
   <img src="docs/screenshots/demo-news.png" width="820" alt="A news article converted to SOL in the demo site, with code blocks and non-USD prices left alone">
