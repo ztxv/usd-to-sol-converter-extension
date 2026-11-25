@@ -145,6 +145,14 @@ To deploy your own copy, drag the `demo-site` folder onto [vercel.com/drop](http
 
 The demo uses copies of the engine files in `demo-site/engine/`. The unit tests fail if those copies fall out of date. Details are in [`demo-site/README.md`](demo-site/README.md).
 
+### Link previews
+
+Sharing the demo link in iMessage, Slack, Discord, X or LinkedIn shows a branded card ([`demo-site/og-image.png`](demo-site/og-image.png), 1200×630), driven by the Open Graph and Twitter tags in the `<head>` of [`demo-site/index.html`](demo-site/index.html). The same files hold the favicons, `apple-touch-icon.png`, `icon-192.png`/`icon-512.png` and [`manifest.webmanifest`](demo-site/manifest.webmanifest).
+
+- **Absolute URLs.** Crawlers don't run JavaScript and some apps (iMessage included) ignore relative image URLs, so `og:url`, `og:image`, `twitter:image` and the canonical link all use `https://solify-extension.vercel.app`. If the domain changes, update those four in `index.html`.
+- **Re-rendering.** The card's source is [`scripts/og-image.html`](scripts/og-image.html), and the icons come from [`scripts/app-icon.svg`](scripts/app-icon.svg). Run `node scripts/render-brand-assets.cjs` from the repository root. It uses the preinstalled Playwright and the bundled Inter font in `scripts/fonts/`, so it needs no network and adds no dependencies.
+- **Caching.** Apps cache previews per URL. After a redeploy, share the link with a throwaway query string such as `?v=2` to see the new card right away, or use the platform's link-preview debugger.
+
 ## Development
 
 The production code has no dependencies. After you edit it, click **Reload** on SOLify in `chrome://extensions`, then reload the test page. To debug, inspect the service worker from the extension card for price errors, or right-click the popup and choose **Inspect** for its UI.

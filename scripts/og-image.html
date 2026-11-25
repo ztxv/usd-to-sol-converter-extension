@@ -1,0 +1,127 @@
+<!doctype html>
+<!--
+  Source for demo-site/og-image.png, the link-preview card shown by iMessage, Slack, Discord, X and LinkedIn.
+  Renders at exactly 1200x630. Re-render it (and the app icons) from the repository root with:
+    node scripts/render-brand-assets.cjs
+  That uses the preinstalled Playwright. Fonts load from scripts/fonts/, never from the network.
+  The motif on the right is illustrative UI: shop.example is not a real store, and the SOL
+  amount uses the same fixed $99.82 illustration rate as the extension popup's preview.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Inter'; src: url('fonts/inter-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: 'Inter', sans-serif; color: #eeeef5; position: relative;
+    background:
+      radial-gradient(640px 420px at 100% 0%, rgba(153, 69, 255, 0.30), transparent 70%),
+      radial-gradient(520px 320px at 0% 0%, rgba(0, 255, 163, 0.12), transparent 70%),
+      radial-gradient(700px 300px at 55% 110%, rgba(111, 214, 255, 0.10), transparent 70%),
+      #101115;
+  }
+
+  /* Left column: brand, headline, subline, chips */
+  .left { position: absolute; left: 64px; top: 64px; width: 600px; height: 502px; display: flex; flex-direction: column; }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand img { width: 56px; height: 44px; }
+  .brand b { font-weight: 800; font-size: 46px; letter-spacing: -0.035em; }
+  .brand b i { font-style: normal; color: #a98bfa; }
+  .pill { margin-left: 6px; font-weight: 650; font-size: 17px; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 14px; border-radius: 999px; background: rgba(172, 136, 245, 0.14); color: #cbb6f7; border: 1.5px solid rgba(172, 136, 245, 0.35); }
+  h1 { font-weight: 800; font-size: 78px; line-height: 1.02; letter-spacing: -0.045em; margin-top: 50px; }
+  h1 span { background: linear-gradient(100deg, #00ffa3 0%, #6fd6ff 50%, #b18cff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 6px; }
+  p.sub { margin-top: 24px; font-size: 27px; line-height: 1.4; color: #b9b4c4; max-width: 570px; }
+  .foot { margin-top: auto; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+  .chip { font-weight: 650; font-size: 17px; padding: 7px 12px; border-radius: 999px; white-space: nowrap; border: 1.5px solid; }
+  .c1 { background: rgba(63, 242, 176, 0.10); color: #5ff5bf; border-color: rgba(63, 242, 176, 0.32); }
+  .c2 { background: rgba(172, 136, 245, 0.12); color: #cbb6f7; border-color: rgba(172, 136, 245, 0.34); }
+  .c3 { background: rgba(111, 214, 255, 0.10); color: #8fdcff; border-color: rgba(111, 214, 255, 0.30); }
+  .c4 { background: rgba(213, 189, 146, 0.10); color: #e3cda4; border-color: rgba(213, 189, 146, 0.30); }
+
+  /* Right stage: the product motif */
+  .stage { position: absolute; left: 690px; top: 64px; width: 446px; height: 502px; }
+  .popup {
+    position: absolute; right: 16px; top: 16px; width: 262px; padding: 18px 20px; border-radius: 20px;
+    background: radial-gradient(260px 160px at 100% 0%, rgba(53, 38, 72, 0.7), transparent 70%), #16161c;
+    border: 1.5px solid #3b3549; transform: rotate(6deg);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 60px rgba(153, 69, 255, 0.18);
+  }
+  .p-head { display: flex; align-items: center; justify-content: space-between; }
+  .p-brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 22px; letter-spacing: -0.03em; }
+  .p-brand img { width: 26px; height: 20px; }
+  .p-brand i { font-style: normal; color: #a98bfa; }
+  .badge { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; color: #a3a0b4; border: 1px solid #3b3549; border-radius: 6px; padding: 5px 7px; }
+  .row { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; font-size: 16px; color: #c9c6d1; }
+  .row strong { color: #eeeef5; font-weight: 600; }
+  .switch { width: 40px; height: 24px; border-radius: 99px; background: #ac88f5; position: relative; }
+  .switch::after { content: ""; position: absolute; right: 4px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: #17121f; }
+  .select { font-size: 14px; color: #e9e5f2; background: #202027; border: 1px solid #38353f; border-radius: 8px; padding: 5px 12px; min-width: 92px; }
+  .preview { margin-top: 16px; display: flex; align-items: center; justify-content: space-between; background: #1d1c23; border-radius: 9px; padding: 10px 12px; }
+  .preview span { font-size: 10px; letter-spacing: 0.14em; color: #817b90; font-weight: 600; }
+  .preview b { display: flex; align-items: center; gap: 6px; font-size: 16px; color: #cbb6f7; font-weight: 600; }
+  .preview b img { width: 17px; height: 13px; }
+
+  .browser {
+    position: absolute; left: 8px; top: 236px; width: 346px; border-radius: 18px; overflow: hidden;
+    background: #fff; border: 1.5px solid #3b3549; transform: rotate(-4deg);
+    box-shadow: 0 34px 80px rgba(0, 0, 0, 0.6);
+  }
+  .b-top { display: flex; align-items: center; gap: 12px; background: #1b1a20; padding: 11px 14px; }
+  .lights { display: flex; gap: 6px; }
+  .lights i { width: 10px; height: 10px; border-radius: 50%; }
+  .lights i:nth-child(1) { background: #ff5f57; } .lights i:nth-child(2) { background: #febc2e; } .lights i:nth-child(3) { background: #28c840; }
+  .url { flex: 1; font-size: 13px; color: #d6d2de; background: #232129; border-radius: 7px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .url img { width: 16px; height: 13px; }
+  .b-body { padding: 16px 20px 18px; color: #17171c; }
+  .thumb { height: 56px; border-radius: 12px; background: linear-gradient(135deg, #e8e4ff, #c6bdf8 60%, #a495f0); }
+  .item { margin-top: 12px; font-weight: 650; font-size: 18px; letter-spacing: -0.01em; }
+  .price { margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; font-weight: 750; font-size: 30px; letter-spacing: -0.03em; }
+  .price img { width: 30px; height: 24px; }
+  .cart { margin-top: 14px; background: #17171c; color: #fff; border-radius: 99px; text-align: center; font-weight: 650; font-size: 15px; padding: 10px; }
+
+  .tip {
+    position: absolute; left: 132px; top: 446px; transform: rotate(-4deg);
+    background: #26232e; color: #eeeef5; border: 1.5px solid #4e4462; border-radius: 10px; padding: 9px 13px;
+    font-size: 15px; font-weight: 500; white-space: nowrap; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+  }
+  .tip b { color: #e3cda4; font-weight: 650; }
+</style>
+</head>
+<body>
+  <div class="left">
+    <div class="brand">
+      <img src="../demo-site/assets/solana.svg" alt="">
+      <b>SOLify<i>.</i></b>
+      <span class="pill">Chrome extension</span>
+    </div>
+    <h1>Dollar prices,<br><span>now in SOL.</span></h1>
+    <p class="sub">A Chrome extension that shows dollar prices on the sites you browse in SOL, at the live market rate.</p>
+    <div class="foot">
+      <span class="chip c1">Live SOL price</span>
+      <span class="chip c2">Hover for USD</span>
+      <span class="chip c3">Restore USD</span>
+      <span class="chip c4">No tracking</span>
+    </div>
+  </div>
+
+  <div class="stage" aria-hidden="true">
+    <div class="popup">
+      <div class="p-head"><span class="p-brand"><img src="../demo-site/assets/solana.svg" alt=""><span>SOLify<i>.</i></span></span><span class="badge">THE SOL LENS</span></div>
+      <div class="row"><strong>Conversion</strong><span class="switch"></span></div>
+      <div class="row"><span>Display</span><span class="select">Logo</span></div>
+      <div class="preview"><span>PREVIEW</span><b><img src="../demo-site/assets/solana.svg" alt="">1.002 SOL</b></div>
+    </div>
+    <div class="browser">
+      <div class="b-top"><span class="lights"><i></i><i></i><i></i></span><span class="url">shop.example<img src="../demo-site/assets/solana.svg" alt=""></span></div>
+      <div class="b-body">
+        <div class="thumb"></div>
+        <div class="item">Mechanical keyboard</div>
+        <div class="price"><img src="../demo-site/assets/solana.svg" alt="">1.302 SOL</div>
+      </div>
+    </div>
+    <div class="tip">Original: <b>$129.99 USD</b></div>
+  </div>
+</body>
+</html>
