@@ -1,6 +1,6 @@
 # SOLify demo site
 
-A static, dependency-free page that shows how SOLify works. Live at **[solify-two.vercel.app](https://solify-two.vercel.app/)**. It runs the extension's real
+A static, dependency-free page that shows how SOLify works. Live at **[solify-extension.vercel.app](https://solify-extension.vercel.app/)**. It runs the extension's real
 `detector.js`, `formatting.js` and `converter.js` (copied into `engine/`) against a simulated
 browser window, next to a working copy of the popup.
 
